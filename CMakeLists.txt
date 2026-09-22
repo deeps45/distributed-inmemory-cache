@@ -89,6 +89,9 @@ if(CACHE_BUILD_BENCHMARKS)
   add_executable(bench_cache benchmarks/bench_cache.cpp)
   target_link_libraries(bench_cache PRIVATE cache_core benchmark::benchmark_main)
 
+  add_executable(bench_lock_overhead benchmarks/bench_lock_overhead.cpp)
+  target_link_libraries(bench_lock_overhead PRIVATE benchmark::benchmark_main)
+
   if(CACHE_HAVE_REDIS)
     add_executable(bench_tiered benchmarks/bench_tiered.cpp)
     target_link_libraries(bench_tiered PRIVATE redis_tier benchmark::benchmark_main)

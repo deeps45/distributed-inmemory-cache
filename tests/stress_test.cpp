@@ -22,7 +22,7 @@ int main() {
   constexpr int kShards = 8;
 
   cache::ShardedCache<int, std::string> c(/*capacity=*/kKeyspace / 2, kShards, /*use_pool=*/true,
-                                           std::chrono::milliseconds(20));
+                                           /*use_read_buffer=*/true, std::chrono::milliseconds(20));
 
   std::atomic<long> total_ops{0};
   std::vector<std::thread> threads;
