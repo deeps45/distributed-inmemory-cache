@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libhiredis-dev
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build -j 4
+
+      - name: Unit tests
+        run: ./build/unit_tests
+
+      - name: Stress test (no sanitizer - correctness/invariants only)
+        run: ./build/stress_test
+
+  thread-sanitizer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libhiredis-dev
+
+      - name: Configure with TSan
+        run: |
+          cmake -S . -B build-tsan -DCMAKE_BUILD_TYPE=Debug -DCACHE_ENABLE_TSAN=ON \
+            -DCACHE_BUILD_BENCHMARKS=OFF -DCACHE_WITH_REDIS=OFF
+
+      - name: Build
+        run: cmake --build build-tsan -j 4 --target unit_tests stress_test
+
+      - name: Unit tests under ThreadSanitizer
+        run: ./build-tsan/unit_tests
+
+      - name: Adversarial stress test under ThreadSanitizer
+        run: ./build-tsan/stress_test

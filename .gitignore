@@ -1,0 +1,7 @@
+build/
+build-*/
+*.o
+*.a
+*.dSYM/
+compile_commands.json
+.cache/
